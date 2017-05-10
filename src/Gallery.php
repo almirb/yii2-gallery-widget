@@ -7,6 +7,7 @@
 
 namespace dosamigos\gallery;
 
+use Yii;
 use yii\base\Widget;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -56,6 +57,11 @@ class Gallery extends Widget
      */
     public $showControls = true;
 
+    /**
+     * @var array The url for delete action
+     */
+    public $deleteUrl = []; 
+    
     /**
      * @inheritdoc
      */
@@ -121,7 +127,25 @@ class Gallery extends Widget
         $imageOptions = ArrayHelper::getValue($item, 'imageOptions', []);
         Html::addCssClass($options, 'gallery-item');
 
-        return Html::a(Html::img($src, $imageOptions), $url, $options);
+        $deleteUrl = ArrayHelper::getValue($item, 'deleteUrl', []);
+        
+        if (empty($deleteUrl)) {
+            return Html::a(Html::img($src, $imageOptions), $url, $options);     
+        } else {
+            $newImage = Html::a(Html::img($src, $imageOptions), $url, $options);
+            $newLink = Html::a('<span class="glyphicon glyphicon-trash gallery-delete-icon"></span>',
+                    $deleteUrl,
+                    [
+                        'data' => [
+                            'method' => 'post',
+                            'confirm' => Yii::t('app','Are you sure to delete this image?'),
+                        ],
+                        'class' => 'gallery-delete-link'
+                    ]
+                );
+                      
+            return $newImage . $newLink;
+        }
     }
 
     /**
@@ -137,7 +161,7 @@ class Gallery extends Widget
         $template[] = '<a class="close">×</a>';
         $template[] = '<a class="play-pause"></a>';
         $template[] = '<ol class="indicator"></ol>';
-
+      
         return Html::tag('div', implode("\n", $template), $this->templateOptions);
     }
 
