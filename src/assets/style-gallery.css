@@ -6,10 +6,9 @@
 
 .gallery-delete-icon {
 	vertical-align:top;
-        background-color:white;
-        border: 1px solid #ccc;
+        background-color:white;       
         border-radius: 10%;
-        padding:5px;              
+        padding:6px;              
 }
 .gallery-item img {
 	padding-bottom: 5px;       

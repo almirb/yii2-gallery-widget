@@ -124,7 +124,7 @@ class Gallery extends Widget
         }
         $url = ArrayHelper::getValue($item, 'url', $src);
         $options = ArrayHelper::getValue($item, 'options', []);
-        $imageOptions = ArrayHelper::getValue($item, 'imageOptions', []);
+        $imageOptions = ArrayHelper::getValue($item, 'imageOptions', ['class' => 'img-thumbnail']);       
         Html::addCssClass($options, 'gallery-item');
 
         $deleteUrl = ArrayHelper::getValue($item, 'deleteUrl', []);
