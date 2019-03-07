@@ -11,6 +11,10 @@ dosamigos.gallery = (function($){
         registerLightBoxHandlers: function(selector, opts) {
             var options = opts || {};
             $(document).off('click.gallery', selector).on('click.gallery', selector, function() {
+                if ($(this).hasClass('gallery-document')) {
+                    return true;
+                }
+
                 var links = $(this).parent().find('a.gallery-item');
                 options.index = $(this)[0];
                 blueimp.Gallery(links, options);

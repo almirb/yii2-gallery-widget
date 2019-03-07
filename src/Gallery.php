@@ -60,8 +60,10 @@ class Gallery extends Widget
     /**
      * @var array The url for delete action
      */
-    public $deleteUrl = []; 
-    
+    public $deleteUrl = [];
+
+    private $_dosamigosAssetBaseUrl;
+
     /**
      * @inheritdoc
      */
@@ -92,9 +94,9 @@ class Gallery extends Widget
         if (empty($this->items)) {
             return null;
         }
+        $this->registerClientScript();
         echo $this->renderItems();
         echo $this->renderTemplate();
-        $this->registerClientScript();
     }
 
     /**
@@ -109,6 +111,43 @@ class Gallery extends Widget
         return Html::tag('div', implode("\n", array_filter($items)), $this->options);
     }
 
+    private function setThumb($src,&$options)
+    {
+        $extension  = pathinfo($src, PATHINFO_EXTENSION);
+
+        if (!ArrayHelper::isIn(strtolower($extension), ['jpg', 'jpeg', 'png'])) {
+
+            $path = $this->_dosamigosAssetBaseUrl.'/icons';
+
+            Html::addCssClass($options, 'gallery-document');
+
+            if ($extension === 'pdf') {
+                $options['target'] = '_blank';
+            }
+
+            switch ($extension) {
+                case 'pdf':
+                case 'zip':
+                case 'dwg':
+                    return "{$path}/{$extension}.png";
+                case 'xls':
+                case 'xlsx':
+                case 'ods':
+                    return "{$path}/xls.png";
+                case 'doc':
+                case 'docx':
+                case 'odt':
+                    return "{$path}/doc.png";
+                default:
+                    return "{$path}/generic.png";
+            }
+        }
+
+        Html::addCssClass($options, 'gallery-item');
+
+        return $src;
+    }
+
     /**
      * @param mixed $item
      * @return null|string the item to render
@@ -118,14 +157,19 @@ class Gallery extends Widget
         if (is_string($item)) {
             return Html::a(Html::img($item), $item, ['class' => 'gallery-item']);
         }
-        $src = ArrayHelper::getValue($item, 'src');
+
+        $options = ArrayHelper::getValue($item, 'options', []);
+
+        $src = $this->setThumb(ArrayHelper::getValue($item, 'src'),$options);
         if ($src === null) {
             return null;
         }
+
+        $imageOptions = ArrayHelper::getValue($item, 'imageOptions', ['class' => 'img-thumbnail']);
+
         $url = ArrayHelper::getValue($item, 'url', $src);
-        $options = ArrayHelper::getValue($item, 'options', []);
-        $imageOptions = ArrayHelper::getValue($item, 'imageOptions', ['class' => 'img-thumbnail']);       
-        Html::addCssClass($options, 'gallery-item');
+
+        //Html::addCssClass($options, 'gallery-item');
 
         $deleteUrl = ArrayHelper::getValue($item, 'deleteUrl', []);
         
@@ -161,7 +205,7 @@ class Gallery extends Widget
         $template[] = '<a class="close">×</a>';
         $template[] = '<a class="play-pause"></a>';
         $template[] = '<ol class="indicator"></ol>';
-      
+
         return Html::tag('div', implode("\n", $template), $this->templateOptions);
     }
 
@@ -172,7 +216,8 @@ class Gallery extends Widget
     {
         $view = $this->getView();
         GalleryAsset::register($view);
-        DosamigosAsset::register($view);
+        $bundle = DosamigosAsset::register($view);
+        $this->_dosamigosAssetBaseUrl  = $bundle->baseUrl;
 
         $id = $this->options['id'];
         $options = Json::encode($this->clientOptions);
