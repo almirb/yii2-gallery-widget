@@ -165,7 +165,8 @@ Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
 ## My Fork Changes (@almirb)
 
-Added the `deleteUrl` option to LightBox.
+- Added the `deleteUrl` option to LightBox.
+- Added support for non-image files (displaying icon thumbnails representing the file type).
 
 ## License
 
